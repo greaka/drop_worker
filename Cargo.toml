@@ -1,0 +1,10 @@
+[package]
+name = "drop_worker"
+version = "0.1.0"
+authors = ["greaka <git@greaka.de>"]
+edition = "2018"
+
+[dependencies.crossbeam]
+version = "0.5"
+optional = true
+package = "crossbeam-channel"
