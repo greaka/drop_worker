@@ -1,8 +1,15 @@
 [package]
 name = "drop_worker"
 version = "0.1.0"
+license = "MIT OR Apache-2.0"
 authors = ["greaka <git@greaka.de>"]
 edition = "2018"
+tags = ["worker", "thread", "drop", "channel", "send", "recv", "receive", "data", "transfer"]
+categories = ["concurrency"]
+repository = "https://github.com/greaka/drop_worker"
+homepage = "https://github.com/greaka/drop_worker"
+documentation = "https://docs.rs/drop_worker"
+description = "Tools for worker threads"
 
 [dependencies.crossbeam]
 version = "0.5"
