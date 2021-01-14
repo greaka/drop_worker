@@ -1,4 +1,4 @@
-//! Provides helpful worker threads that get joined when dropped.
+//! Provides helpful worker threads that get signaled to stop when dropped.
 //!
 //! # Features
 //! The `crossbeam` feature will use unbounded [crossbeam](https://crates.io/crates/crossbeam) channels instead of [std](std::sync::mpsc) channels.
@@ -42,14 +42,17 @@ use std::sync::mpsc::{channel, Sender};
 #[cfg(not(feature = "crossbeam"))]
 pub use std::sync::mpsc::{Receiver, TryRecvError};
 
-use std::{mem::ManuallyDrop, ops::Deref, thread::JoinHandle};
+use std::{
+	mem::ManuallyDrop, 
+	ops::Deref, 
+//	thread::JoinHandle
+};
 
 /// Provides a worker thread that can receive structs of type `T`.
-/// When this instance is dropped, it will signal the worker thread to stop and
-/// wait until joined.
+/// When this instance is dropped, it will signal the worker thread to stop.
 pub struct DropWorker<T> {
     sender: ManuallyDrop<Sender<T>>,
-    thread: JoinHandle<()>,
+//    thread: JoinHandle<()>,
 }
 
 /// Checks if the [`DropWorker`] was dropped and if so then this will call
@@ -82,8 +85,11 @@ impl<T: Send + 'static> DropWorker<T> {
     pub fn new<F: Fn(Receiver<T>) + Send + 'static>(func: F) -> Self {
         let (sender, receiver) = channel::<T>();
         let sender = ManuallyDrop::new(sender);
-        let thread = std::thread::spawn(move || func(receiver));
-        DropWorker { sender, thread }
+        let _thread = std::thread::spawn(move || func(receiver));
+        DropWorker { 
+        	sender, 
+//        	thread 
+        }
     }
 }
 
@@ -97,11 +103,11 @@ impl<T: Send + 'static> Deref for DropWorker<T> {
 
 impl<T> Drop for DropWorker<T> {
     fn drop(&mut self) {
-        let thread;
+        // let thread;
         unsafe {
             ManuallyDrop::drop(&mut self.sender);
-            thread = std::mem::replace(&mut self.thread, std::thread::spawn(|| ()));
+            // thread = std::mem::replace(&mut self.thread, std::thread::spawn(|| ()));
         }
-        let _ = thread.join();
+        // let _ = thread.join();
     }
 }
